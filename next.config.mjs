@@ -31,6 +31,7 @@ const nextConfig = {
     POSTGRES_URL: process.env.POSTGRES_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     WEBSOCKET_PORT: process.env.WEBSOCKET_PORT,
+    NEXT_PUBLIC_WEBSOCKET_PORT: process.env.NEXT_PUBLIC_WEBSOCKET_PORT,
   }
 }
 

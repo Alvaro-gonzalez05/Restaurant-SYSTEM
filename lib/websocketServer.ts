@@ -1,26 +1,35 @@
-import WebSocket, { WebSocketServer } from 'ws';
+import { Server } from 'socket.io';
+import http from 'http';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// Crear un servidor WebSocket
-const wss = new WebSocketServer({ port: 8080 });
+const PORT = process.env.WEBSOCKET_PORT || 8080;
 
-wss.on('connection', (ws) => {
+// Crear un servidor HTTP para usar con Socket.IO
+const httpServer = http.createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*', // Cambiar según sea necesario para producción
+  },
+});
+
+io.on('connection', (socket) => {
   console.log('Cliente conectado al WebSocket');
 
-  ws.on('message', (data) => {
-    const message = data.toString(); // Convertir el mensaje a string
+  socket.on('message', (message) => {
     console.log('Mensaje recibido:', message);
   });
 
-  ws.on('close', () => {
+  socket.on('disconnect', () => {
     console.log('Cliente desconectado del WebSocket');
   });
 });
 
 // Función para notificar a los clientes sobre un nuevo pedido
 export const notifyNewOrder = (order: { id: number; customer_name: string }) => {
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'new-order', data: order }));
-    }
-  });
+  io.emit('new-order', order);
 };
+
+httpServer.listen(PORT, () => {
+  console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
+});

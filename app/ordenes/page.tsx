@@ -10,6 +10,7 @@ import DatabaseInitializer from "@/components/DatabaseInitializer"
 import NotificationSound from "@/components/NotificationSound"
 import type { Order, Product } from "@/lib/models"
 import Swal from "sweetalert2"
+import { io } from "socket.io-client";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -27,31 +28,33 @@ export default function OrdersPage() {
     fetchOrders()
     fetchProducts()
 
-    // Conectar al servidor WebSocket
-    const socket = new WebSocket("ws://localhost:8080")
+    // Conectar al servidor WebSocket usando socket.io
+    const socketUrl = process.env.NODE_ENV === 'production' 
+      ? `https://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}` 
+      : 'http://localhost:8080';
 
-    socket.onopen = () => {
-      console.log("Conectado al servidor WebSocket")
-    }
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+    });
 
-    socket.onmessage = (event) => {
-      console.log("Mensaje recibido desde WebSocket:", event.data);
-      const message = JSON.parse(event.data);
-      if (message.type === "new-order") {
-        console.log("Nueva orden recibida:", message.data);
-        setOrders((prevOrders) => [message.data, ...prevOrders]);
-        setPlayNotification(true);
-        setNewOrderId(message.data.id);
-      }
-    };
+    socket.on('connect', () => {
+      console.log("Conectado al servidor WebSocket");
+    });
 
-    socket.onclose = () => {
-      console.log("Desconectado del servidor WebSocket")
-    }
+    socket.on('new-order', (order) => {
+      console.log("Nueva orden recibida:", order);
+      setOrders((prevOrders) => [order, ...prevOrders]);
+      setPlayNotification(true);
+      setNewOrderId(order.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log("Desconectado del servidor WebSocket");
+    });
 
     return () => {
-      socket.close()
-    }
+      socket.disconnect();
+    };
   }, [])
 
   const fetchOrders = async () => {
