@@ -3,7 +3,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.WEBSOCKET_PORT || 8080;
+const PORT = process.env.PORT || 8080; // Usar el puerto proporcionado por Render
 
 // Crear un servidor HTTP para usar con Socket.IO
 const httpServer = http.createServer();
