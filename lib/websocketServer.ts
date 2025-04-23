@@ -1,35 +1,40 @@
-import { Server } from 'socket.io';
-import http from 'http';
+import { NextApiHandler } from 'next';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const PORT = process.env.PORT || 8080; // Usar el puerto proporcionado por Render
+let io: any;
 
-// Crear un servidor HTTP para usar con Socket.IO
-const httpServer = http.createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*', // Cambiar según sea necesario para producción
-  },
-});
+const websocketHandler: NextApiHandler = (req, res) => {
+  if (!io) {
+    const httpServer = res.socket.server;
+    io = require('socket.io')(httpServer, {
+      cors: {
+        origin: '*',
+      },
+    });
 
-io.on('connection', (socket) => {
-  console.log('Cliente conectado al WebSocket');
+    io.on('connection', (socket) => {
+      console.log('Cliente conectado al WebSocket');
 
-  socket.on('message', (message) => {
-    console.log('Mensaje recibido:', message);
-  });
+      socket.on('message', (message) => {
+        console.log('Mensaje recibido:', message);
+      });
 
-  socket.on('disconnect', () => {
-    console.log('Cliente desconectado del WebSocket');
-  });
-});
+      socket.on('disconnect', () => {
+        console.log('Cliente desconectado del WebSocket');
+      });
+    });
 
-// Función para notificar a los clientes sobre un nuevo pedido
-export const notifyNewOrder = (order: { id: number; customer_name: string }) => {
-  io.emit('new-order', order);
+    console.log('Servidor WebSocket inicializado');
+  }
+
+  res.end();
 };
 
-httpServer.listen(PORT, () => {
-  console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
-});
+export const notifyNewOrder = (order: { id: number; customer_name: string }) => {
+  if (io) {
+    io.emit('new-order', order);
+  }
+};
+
+export default websocketHandler;
