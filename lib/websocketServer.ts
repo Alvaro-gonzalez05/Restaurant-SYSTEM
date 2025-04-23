@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const PORT = process.env.PORT || 8080; // Usar el puerto proporcionado por Render
-const WEBSOCKET_PORT = process.env.WEBSOCKET_PORT || 8080; // Usar un puerto fijo para WebSocket
 
 // Crear un servidor HTTP para usar con Socket.IO
 const httpServer = http.createServer();
@@ -31,6 +30,6 @@ export const notifyNewOrder = (order: { id: number; customer_name: string }) => 
   io.emit('new-order', order);
 };
 
-httpServer.listen(WEBSOCKET_PORT, () => {
-  console.log(`Servidor WebSocket escuchando en el puerto ${WEBSOCKET_PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`Servidor WebSocket escuchando en el puerto ${PORT}`);
 });
