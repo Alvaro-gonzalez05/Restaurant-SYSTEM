@@ -87,8 +87,20 @@ export default function OrderCard({ order, onClick, onUpdateStatus }: OrderCardP
     return null
   }
 
+  // Determinar clases de color según el estado
+  let cardClass = "order-card";
+  let contentClass = "";
+
+  if (order.status === "pending") {
+    cardClass += " order-card-pending";
+    contentClass = "order-content-pending";
+  } else if (order.status === "completed" || order.status === "delivered") {
+    cardClass += " order-card-completed";
+    contentClass = "order-content-completed";
+  }
+
   return (
-    <div className="order-card" onClick={() => onClick(order)}>
+    <div className={cardClass} onClick={() => onClick(order)}>
       <div className="order-header">
         <span className="order-id">Pedido #{order.id}</span>
         <span className={`badge ${getStatusBadgeClass(order.status)}`}>
@@ -103,28 +115,25 @@ export default function OrderCard({ order, onClick, onUpdateStatus }: OrderCardP
                   : "Completado"}
         </span>
       </div>
-
-      <div className="order-details">
+      <div className={`order-details ${contentClass}`}>
         <p className="order-customer">Cliente: {order.customer_name}</p>
-        <p className="order-table">Mesa: {order.table_reference || order.table?.number || order.table_id}</p>
+        <p className="order-table">Mesa: {order.table_reference || order.table_id}</p>
         <p className="order-time">Hora: {formatDate(order.created_at || "")}</p>
         {order.details && <p className="order-notes">Detalles: {order.details}</p>}
       </div>
-
-      <div className="order-total">Total: ${totalAmount.toFixed(2)}</div>
+      <div className={`order-total ${contentClass}`}>Total: ${totalAmount.toFixed(2)}</div>
       {order.items && order.items.length > 0 && (
-        <div className="order-products">
+        <div className={`order-products ${contentClass}`}>
           <p className="order-products-title">Productos:</p>
           <ul className="order-products-list">
             {order.items.map((item, index) => (
               <li key={index} className="order-product-item">
-                {item.quantity}x {item.product_name || `Producto #${item.product_id}`}
+                {item.quantity}x {item.product?.name || `Producto #${item.product_id}`}
               </li>
             ))}
           </ul>
         </div>
       )}
-
       {renderStatusButton()}
     </div>
   )

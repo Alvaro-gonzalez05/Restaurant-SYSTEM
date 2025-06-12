@@ -493,6 +493,27 @@ button:disabled {
   transform: translateY(-5px);
 }
 
+.order-card-pending {
+  background-color: var(--error-color);
+  color: white;
+  border: 2px solid var(--error-color);
+}
+
+.order-content-pending {
+  color: white !important;
+}
+
+.order-card-completed {
+  background-color: #f5f5f5;
+  color: var(--medium-gray);
+  opacity: 0.7;
+}
+
+.order-content-completed {
+  color: var(--medium-gray) !important;
+  text-decoration: line-through;
+}
+
 .order-header {
   display: flex;
   justify-content: space-between;
