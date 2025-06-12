@@ -28,9 +28,8 @@ export default function OrdersPage() {
     fetchOrders()
     fetchProducts()
 
-    // Conectar al servidor WebSocket usando socket.io
-    const socketUrl = `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`; // Usar el dominio principal sin puerto
-
+    // Conectar al servidor WebSocket usando socket.io-client
+    const socketUrl = `wss://${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`;
     const socket = io(socketUrl, {
       transports: ['websocket'],
     });
