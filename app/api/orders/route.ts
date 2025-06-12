@@ -99,7 +99,15 @@ export async function POST(request: Request) {
     }
 
     // Notificar a los clientes sobre el nuevo pedido
-    notifyNewOrder(newOrder);
+    try {
+      await fetch('https://restaurant-system-7frq.onrender.com/emit-new-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder),
+      });
+    } catch (err) {
+      console.error('Error notificando al WebSocket:', err);
+    }
 
     return NextResponse.json(newOrder)
   } catch (error) {

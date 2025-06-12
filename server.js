@@ -1,13 +1,14 @@
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
+const express = require('express');
 
 const PORT = process.env.PORT || 8080;
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end('WebSocket server running');
-});
+const app = express();
+app.use(express.json());
+
+const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
@@ -25,6 +26,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('Cliente desconectado del WebSocket');
   });
+});
+
+app.post('/emit-new-order', (req, res) => {
+  const order = req.body;
+  io.emit('new-order', order);
+  res.status(200).json({ ok: true });
 });
 
 // Función para emitir un nuevo pedido desde otro archivo si lo necesitas
