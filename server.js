@@ -2,7 +2,7 @@ require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
 
-const PORT = process.env.WEBSOCKET_PORT || 8080;
+const PORT = process.env.PORT || 8080;
 
 const server = http.createServer((req, res) => {
   res.writeHead(200);
